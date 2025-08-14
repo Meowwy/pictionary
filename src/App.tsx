@@ -1,0 +1,111 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { CreateRoomModal } from "@/components/create-room-modal";
+import { JoinRoomModal } from "@/components/join-room-modal";
+import { RoomCard } from "@/components/room-card";
+import { Users } from "lucide-react";
+
+// Mock data for available rooms
+const mockRooms = [
+  // { id: "1", name: "Fun Drawing Room", hasPassword: false, playerCount: 3 },
+  //{ id: "2", name: "Artists Only", hasPassword: true, playerCount: 2 },
+  // { id: "3", name: "Quick Games", hasPassword: false, playerCount: 5 },
+  // { id: "4", name: "Private Session", hasPassword: true, playerCount: 1 },
+  // { id: "5", name: "Beginners Welcome", hasPassword: false, playerCount: 4 },
+  // { id: "6", name: "Pro Players", hasPassword: true, playerCount: 6 },
+];
+
+export default function App() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<
+    (typeof mockRooms)[0] | null
+  >(null);
+
+  const handleJoinRoom = (room: (typeof mockRooms)[0]) => {
+    setSelectedRoom(room);
+    setIsJoinModalOpen(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-800 dark:text-white mb-4">
+            Pictionary Game
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Draw, guess, and have fun with friends!
+          </p>
+        </div>
+
+        {/* Create Room Button */}
+        <div className="flex justify-center mb-8">
+          <Button
+            onClick={() => setIsCreateModalOpen(true)}
+            size="lg"
+            className="px-8 py-3 text-lg font-semibold"
+          >
+            Create New Room
+          </Button>
+        </div>
+
+        {/* Available Rooms */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
+            Available Rooms
+          </h2>
+
+          {mockRooms.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 text-center max-w-md mx-auto border border-white/20 dark:border-gray-700/20">
+                <Users className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  No rooms available
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
+                  There are currently no game rooms created. Be the first to
+                  start a new room and invite your friends to play!
+                </p>
+                <Button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="mt-2"
+                >
+                  Create Your First Room
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-2 sm:px-0">
+              {mockRooms.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  onJoin={() => handleJoinRoom(room)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Modals */}
+        <CreateRoomModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+        />
+
+        <JoinRoomModal
+          isOpen={isJoinModalOpen}
+          onClose={() => {
+            setIsJoinModalOpen(false);
+            setSelectedRoom(null);
+          }}
+          room={selectedRoom}
+        />
+      </div>
+    </div>
+  );
+}
