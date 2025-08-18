@@ -1,13 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Lock, Users } from "lucide-react";
-
-interface Room {
-  _id: string;
-  name: string;
-  hasPassword: boolean;
-  playerCount: number;
-}
+import type { Room } from "convex/rooms";
 
 interface RoomCardProps {
   room: Room;

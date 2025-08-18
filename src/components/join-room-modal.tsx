@@ -13,13 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock } from "lucide-react";
-
-interface Room {
-  _id: string;
-  name: string;
-  hasPassword: boolean;
-  playerCount: number;
-}
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import type { Room } from "convex/rooms";
+import type { Id } from "convex/_generated/dataModel";
 
 interface JoinRoomModalProps {
   isOpen: boolean;
@@ -30,21 +27,42 @@ interface JoinRoomModalProps {
 export function JoinRoomModal({ isOpen, onClose, room }: JoinRoomModalProps) {
   const [playerName, setPlayerName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const joinRoom = useMutation(api.rooms.joinRoom);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!room) return;
+
     // Handle joining room logic here
-    console.log("Joining room:", {
-      roomId: room?._id,
-      playerName,
-      password: room?.hasPassword ? password : null,
-    });
-    onClose();
+    try {
+      const result = await joinRoom({
+        roomId: room._id as Id<"game_rooms">, // the cast is needed bacause Convex expects specific Id type
+        nickname: playerName,
+        password,
+      });
+
+      if (result === "Incorrect password") {
+        setError("Incorrect password");
+        console.log("Incorrect password - error set");
+      } else {
+        setPlayerName("");
+        setPassword("");
+        setError(null);
+        onClose();
+      }
+    } catch (err: any) {
+      if (err.message === "Incorrect password") {
+        console.log(err.message);
+      }
+    }
   };
 
   const handleClose = () => {
     setPlayerName("");
     setPassword("");
+    setError(null);
     onClose();
   };
 
@@ -111,6 +129,8 @@ export function JoinRoomModal({ isOpen, onClose, room }: JoinRoomModalProps) {
             </Button>
           </div>
         </form>
+
+        {error && <p className="text-red-500 text-sm">{error}</p>}
       </DialogContent>
     </Dialog>
   );

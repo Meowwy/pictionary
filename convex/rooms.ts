@@ -1,6 +1,13 @@
 import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
 
+export interface Room {
+  _id: string;
+  name: string;
+  hasPassword: boolean;
+  playerCount: number;
+}
+
 export const createRoom = mutation({
     args: {
         name: v.string(),
@@ -45,5 +52,28 @@ export const getPlayers = query({
   handler: async (ctx) => {
     return ctx.db.query("players").collect();
   },
+  });
+
+  export const joinRoom = mutation({
+    args: {
+      roomId: v.id("game_rooms"),
+      nickname: v.string(),
+      password: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+      const room = await ctx.db.get(args.roomId);
+      if (!room) {
+        throw new Error("Room not found");
+      }
+      else if (room.password !== args.password) {
+        return "Incorrect password";
+      }
+      else {
+        await ctx.db.insert("players", {
+          room_id: args.roomId,
+          nickname: args.nickname,
+          });
+      }
+    },
   });
 
