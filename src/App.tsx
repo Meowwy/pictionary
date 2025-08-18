@@ -1,30 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CreateRoomModal } from "@/components/create-room-modal";
 import { JoinRoomModal } from "@/components/join-room-modal";
 import { RoomCard } from "@/components/room-card";
 import { Users } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
 
-// Mock data for available rooms
-const mockRooms = [
-  // { id: "1", name: "Fun Drawing Room", hasPassword: false, playerCount: 3 },
-  //{ id: "2", name: "Artists Only", hasPassword: true, playerCount: 2 },
-  // { id: "3", name: "Quick Games", hasPassword: false, playerCount: 5 },
-  // { id: "4", name: "Private Session", hasPassword: true, playerCount: 1 },
-  // { id: "5", name: "Beginners Welcome", hasPassword: false, playerCount: 4 },
-  // { id: "6", name: "Pro Players", hasPassword: true, playerCount: 6 },
-];
+//const rooms = [
+// { id: "1", name: "Fun Drawing Room", hasPassword: false, playerCount: 3 },
+//{ id: "2", name: "Artists Only", hasPassword: true, playerCount: 2 },
+// { id: "3", name: "Quick Games", hasPassword: false, playerCount: 5 },
+// { id: "4", name: "Private Session", hasPassword: true, playerCount: 1 },
+// { id: "5", name: "Beginners Welcome", hasPassword: false, playerCount: 4 },
+// { id: "6", name: "Pro Players", hasPassword: true, playerCount: 6 },
+//];
 
 export default function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<
-    (typeof mockRooms)[0] | null
+    (typeof roomsForCard)[0] | null
   >(null);
 
-  const handleJoinRoom = (room: (typeof mockRooms)[0]) => {
+  // get created rooms
+  let rooms = useQuery(api.rooms.getRooms) ?? [];
+
+  let players = useQuery(api.rooms.getPlayers) ?? [];
+
+  type RoomForCard = {
+    _id: string;
+    name: string;
+    hasPassword: boolean;
+    playerCount: number;
+  };
+
+  let roomsForCard: RoomForCard[] = [];
+  if (rooms.length > 0) {
+    roomsForCard = rooms.map((room) => {
+      const playerCount = players.filter(
+        (player) => player.room_id === room._id
+      ).length;
+      return {
+        _id: room._id,
+        name: room.name,
+        playerCount: playerCount,
+        hasPassword: room.password === undefined ? false : true,
+      };
+    });
+  }
+
+  const handleJoinRoom = (room: (typeof roomsForCard)[0]) => {
     setSelectedRoom(room);
     setIsJoinModalOpen(true);
   };
@@ -58,8 +86,8 @@ export default function App() {
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
             Available Rooms
           </h2>
-
-          {mockRooms.length === 0 ? (
+          {/* If no rooms created */}
+          {rooms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-4">
               <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 text-center max-w-md mx-auto border border-white/20 dark:border-gray-700/20">
                 <Users className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
@@ -80,12 +108,8 @@ export default function App() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-2 sm:px-0">
-              {mockRooms.map((room) => (
-                <RoomCard
-                  key={room.id}
-                  room={room}
-                  onJoin={() => handleJoinRoom(room)}
-                />
+              {roomsForCard.map((room) => (
+                <RoomCard room={room} onJoin={() => handleJoinRoom(room)} />
               ))}
             </div>
           )}
