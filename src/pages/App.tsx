@@ -7,16 +7,7 @@ import { JoinRoomModal } from "@/components/join-room-modal";
 import { RoomCard } from "@/components/room-card";
 import { Users } from "lucide-react";
 import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-//const rooms = [
-// { id: "1", name: "Fun Drawing Room", hasPassword: false, playerCount: 3 },
-//{ id: "2", name: "Artists Only", hasPassword: true, playerCount: 2 },
-// { id: "3", name: "Quick Games", hasPassword: false, playerCount: 5 },
-// { id: "4", name: "Private Session", hasPassword: true, playerCount: 1 },
-// { id: "5", name: "Beginners Welcome", hasPassword: false, playerCount: 4 },
-// { id: "6", name: "Pro Players", hasPassword: true, playerCount: 6 },
-//];
+import { api } from "../../convex/_generated/api";
 
 export default function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
