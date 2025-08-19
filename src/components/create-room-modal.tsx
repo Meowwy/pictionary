@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { getDeviceId } from "@/utils/simpleUtils";
 
 interface CreateRoomModalProps {
   isOpen: boolean;
@@ -42,6 +43,7 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
       name: roomName,
       password: usePassword ? password : undefined,
       player: playerName,
+      deviceId: getDeviceId(),
     });
     onClose();
     setRoomName(""); // reseting the form, because we use react state to get the values

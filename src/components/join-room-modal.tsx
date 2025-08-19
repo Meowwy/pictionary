@@ -17,6 +17,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Room } from "convex/rooms";
 import type { Id } from "convex/_generated/dataModel";
+import { getDeviceId } from "@/utils/simpleUtils";
 
 interface JoinRoomModalProps {
   isOpen: boolean;
@@ -41,6 +42,7 @@ export function JoinRoomModal({ isOpen, onClose, room }: JoinRoomModalProps) {
         roomId: room._id as Id<"game_rooms">, // the cast is needed bacause Convex expects specific Id type
         nickname: playerName,
         password,
+        deviceId: getDeviceId(),
       });
 
       if (result === "Incorrect password") {

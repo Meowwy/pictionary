@@ -13,6 +13,7 @@ export const createRoom = mutation({
         name: v.string(),
         password: v.optional(v.string()),
         player: v.string(),
+        deviceId: v.string(),
     },
     handler: async (ctx, args) => {
         const roomId = await ctx.db.insert("game_rooms", {
@@ -25,6 +26,7 @@ export const createRoom = mutation({
             room_id: roomId,
             nickname: args.player,
             admin: true,
+            deviceId: args.deviceId,
         });
 
         return roomId;
@@ -60,13 +62,14 @@ export const getPlayers = query({
       roomId: v.id("game_rooms"),
       nickname: v.string(),
       password: v.optional(v.string()),
+      deviceId: v.string(),
     },
     handler: async (ctx, args) => {
       const room = await ctx.db.get(args.roomId);
       if (!room) {
         throw new Error("Room not found");
       }
-      else if (room.password !== args.password) {
+      else if (room.password && room.password !== args.password) {
         return "Incorrect password";
       }
       else {
@@ -74,6 +77,7 @@ export const getPlayers = query({
           room_id: args.roomId,
           nickname: args.nickname,
           admin: false,
+          deviceId: args.deviceId,
           });
       }
     },

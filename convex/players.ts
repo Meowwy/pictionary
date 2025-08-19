@@ -6,12 +6,14 @@ export const addNewPlayer = mutation({
         room_id: v.id("game_rooms"),
         nickname: v.string(),
         admin: v.boolean(),
+        deviceId: v.string(),
     },
     handler: async (ctx, args) => {
         const room = await ctx.db.insert("players", {
             room_id: args.room_id,
             nickname: args.nickname,
             admin: args.admin,
+            deviceId: args.deviceId,
         });
 },
 });

@@ -13,5 +13,7 @@ export default defineSchema({
         nickname: v.string(),
         admin: v.boolean(),
         score: v.optional(v.number()),
+        deviceId: v.string(),
+    
     })
 });
