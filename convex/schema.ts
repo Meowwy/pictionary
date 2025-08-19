@@ -11,5 +11,7 @@ export default defineSchema({
     players: defineTable({
         room_id: v.id("game_rooms"),
         nickname: v.string(),
+        admin: v.boolean(),
+        score: v.optional(v.number()),
     })
 });

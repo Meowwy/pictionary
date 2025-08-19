@@ -24,6 +24,7 @@ export const createRoom = mutation({
         await ctx.db.insert("players", {
             room_id: roomId,
             nickname: args.player,
+            admin: true,
         });
 
         return roomId;
@@ -72,6 +73,7 @@ export const getPlayers = query({
         await ctx.db.insert("players", {
           room_id: args.roomId,
           nickname: args.nickname,
+          admin: false,
           });
       }
     },
