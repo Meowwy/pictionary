@@ -1,6 +1,17 @@
 import { mutation } from "./_generated/server"
 import { v } from "convex/values"
 
+export interface Player {
+    _id: string;
+    room_id: string;
+    nickname: string;
+    score: number;
+    admin: boolean;
+    deviceId: string;
+}
+
+
+
 export const addNewPlayer = mutation({
     args: {
         room_id: v.id("game_rooms"),

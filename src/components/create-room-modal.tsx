@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getDeviceId } from "@/utils/simpleUtils";
+import { useNavigate } from "react-router-dom";
 
 interface CreateRoomModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface CreateRoomModalProps {
 
 export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
   const createRoom = useMutation(api.rooms.createRoom);
+  const navigate = useNavigate();
 
   const [roomName, setRoomName] = useState("");
   const [playerName, setPlayerName] = useState("");
@@ -45,6 +47,7 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
       player: playerName,
       deviceId: getDeviceId(),
     });
+    navigate("/waitRoom", { state: { roomName } });
     onClose();
     setRoomName(""); // reseting the form, because we use react state to get the values
     setPlayerName("");

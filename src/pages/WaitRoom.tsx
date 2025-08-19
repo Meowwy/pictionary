@@ -4,23 +4,42 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlayerTable } from "@/components/player-table";
 import { AddPlayerModal } from "@/components/add-player-modal";
-import type { Room } from "convex/rooms";
+import { useLocation } from "react-router-dom";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { getDeviceId } from "@/utils/simpleUtils";
+import type { Player } from "convex/players";
 
-// Mock data for players in the room
-const mockPlayers = [
-  { id: "1", name: "Alice Johnson", isLocal: true },
-  { id: "2", name: "Bob Smith", isLocal: false },
-  { id: "3", name: "Charlie Brown", isLocal: true },
-  { id: "4", name: "Diana Prince", isLocal: false },
-  { id: "5", name: "Eve Wilson", isLocal: false },
-];
-
-interface WaitRoomPageProps {
-  room: Room;
-}
-
-export default function WaitRoomPage({ room }: WaitRoomPageProps) {
+export default function WaitRoomPage() {
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
+  const location = useLocation();
+
+  const roomName = location.state?.roomName;
+  const room =
+    useQuery(api.rooms.getRoomByRoomName, { roomName: roomName }) ?? null;
+  const playersData =
+    useQuery(
+      api.rooms.getPlayersInRoom,
+      room ? { roomId: room._id } : { roomId: "" as any }
+    ) ?? [];
+
+  type PlayersForWaitList = {
+    id: string;
+    name: string;
+    isLocal: boolean;
+  };
+
+  let players: Player[] = playersData as Player[];
+  let playersForWaitList: PlayersForWaitList[] = [];
+  if (players.length > 0) {
+    playersForWaitList = players.map((player) => {
+      return {
+        id: player._id,
+        name: player.nickname,
+        isLocal: player.deviceId === getDeviceId(),
+      };
+    });
+  } // error ',' expected
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -41,9 +60,9 @@ export default function WaitRoomPage({ room }: WaitRoomPageProps) {
         {/* Players Table */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-            Players ({mockPlayers.length})
+            Players ({playersForWaitList.length})
           </h2>
-          <PlayerTable players={mockPlayers} />
+          <PlayerTable players={playersForWaitList} />
         </div>
 
         {/* Add Player Section */}
@@ -69,7 +88,7 @@ export default function WaitRoomPage({ room }: WaitRoomPageProps) {
         {/* Add Player Modal */}
         <AddPlayerModal
           isOpen={isAddPlayerModalOpen}
-          room={room}
+          roomId={room ? room._id : null}
           onClose={() => setIsAddPlayerModalOpen(false)}
         />
       </div>

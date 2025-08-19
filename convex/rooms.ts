@@ -40,9 +40,21 @@ export const getRooms = query({
 },
 });
 
-export const getPlayersInRoom = query({
-  args: { roomId: v.id("game_rooms") },
+export const getRoomByRoomName = query({
+  args: { roomName: v.string() },
   handler: async (ctx, args) => {
+    return ctx.db
+      .query("game_rooms")
+      .filter((q) => q.eq(q.field("name"), args.roomName))
+      .first();
+  },
+});
+
+
+export const getPlayersInRoom = query({
+  args: { roomId: v.optional(v.id("game_rooms")) },
+  handler: async (ctx, args) => {
+    if (!args.roomId) return [];
     return ctx.db
       .query("players")
       .filter((q) => q.eq(q.field("room_id"), args.roomId))

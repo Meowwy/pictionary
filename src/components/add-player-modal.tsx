@@ -13,18 +13,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useMutation } from "convex/react";
-import { api } from "convex/_generated/api";
-import type { Room } from "convex/rooms";
+import { api } from "../../convex/_generated/api";
 import { getDeviceId } from "@/utils/simpleUtils";
 import type { Id } from "convex/_generated/dataModel";
 
 interface AddPlayerModalProps {
   isOpen: boolean;
-  room: Room | null;
+  roomId: string | null;
   onClose: () => void;
 }
 
-export function AddPlayerModal({ isOpen, onClose, room }: AddPlayerModalProps) {
+export function AddPlayerModal({
+  isOpen,
+  onClose,
+  roomId,
+}: AddPlayerModalProps) {
   const [playerName, setPlayerName] = useState("");
 
   const addPlayer = useMutation(api.rooms.joinRoom);
@@ -32,14 +35,13 @@ export function AddPlayerModal({ isOpen, onClose, room }: AddPlayerModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Adding local player:", playerName);
-    // Add player logic would go here
-    if (!room) return;
+    if (!roomId) return;
 
     void addPlayer({
       nickname: playerName,
       password: true,
       deviceId: getDeviceId(),
-      roomId: room._id as Id<"game_rooms">,
+      roomId: roomId as Id<"game_rooms">,
     });
     setPlayerName("");
     onClose();
