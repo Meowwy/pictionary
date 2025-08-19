@@ -61,7 +61,7 @@ export const getPlayers = query({
     args: {
       roomId: v.id("game_rooms"),
       nickname: v.string(),
-      password: v.optional(v.string()),
+      password: v.optional(v.union(v.string(), v.boolean())),
       deviceId: v.string(),
     },
     handler: async (ctx, args) => {
@@ -69,7 +69,7 @@ export const getPlayers = query({
       if (!room) {
         throw new Error("Room not found");
       }
-      else if (room.password && room.password !== args.password) {
+      else if ((room.password && room.password !== args.password) || args.password === false) {
         return "Incorrect password";
       }
       else {

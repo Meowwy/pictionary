@@ -128,7 +128,11 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
             >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1">
+            <Button
+              type="submit"
+              className="flex-1"
+              disabled={!roomName.trim() || !playerName.trim()}
+            >
               Create Room
             </Button>
           </div>

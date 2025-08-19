@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlayerTable } from "@/components/player-table";
 import { AddPlayerModal } from "@/components/add-player-modal";
+import type { Room } from "convex/rooms";
 
 // Mock data for players in the room
 const mockPlayers = [
@@ -14,7 +15,11 @@ const mockPlayers = [
   { id: "5", name: "Eve Wilson", isLocal: false },
 ];
 
-export default function WaitRoomPage() {
+interface WaitRoomPageProps {
+  room: Room;
+}
+
+export default function WaitRoomPage({ room }: WaitRoomPageProps) {
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
 
   return (
@@ -64,6 +69,7 @@ export default function WaitRoomPage() {
         {/* Add Player Modal */}
         <AddPlayerModal
           isOpen={isAddPlayerModalOpen}
+          room={room}
           onClose={() => setIsAddPlayerModalOpen(false)}
         />
       </div>
