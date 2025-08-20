@@ -115,3 +115,34 @@ export const getPlayers = query({
     },
   });
 
+export const removePlayerFromRoom = mutation({
+  args: {
+    playerId: v.id("players"),
+    roomId: v.id("game_rooms"),
+  },
+  handler: async (ctx, args) => {
+    const player = await ctx.db.get(args.playerId);
+    const room = await ctx.db.get(args.roomId);
+
+    if (!player || !room) {
+      return "Player or room not found";
+    }
+
+    const playersInRoom = await ctx.db
+      .query("players")
+      .filter((q) => q.eq(q.field("room_id"), args.roomId))
+      .collect();
+
+    for (const p of playersInRoom) {
+      if (p._id === args.playerId && p.room_id === args.roomId) {
+        await ctx.db.delete(args.playerId);
+        break;
+      }
+    }
+
+    if (playersInRoom.length <= 1) {
+      await ctx.db.delete(args.roomId);
+    }
+  },
+});
+

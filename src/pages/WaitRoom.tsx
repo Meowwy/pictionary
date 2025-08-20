@@ -9,6 +9,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getDeviceId } from "@/utils/simpleUtils";
 import type { Player } from "convex/players";
+import type { Id } from "convex/_generated/dataModel";
 
 export default function WaitRoomPage() {
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
@@ -20,7 +21,9 @@ export default function WaitRoomPage() {
   const playersData =
     useQuery(
       api.rooms.getPlayersInRoom,
-      room ? { roomId: room._id } : { roomId: "" as any }
+      room
+        ? { roomId: room._id as Id<"game_rooms"> }
+        : { roomId: "" as Id<"game_rooms"> }
     ) ?? [];
 
   type PlayersForWaitList = {
@@ -39,7 +42,7 @@ export default function WaitRoomPage() {
         isLocal: player.deviceId === getDeviceId(),
       };
     });
-  } // error ',' expected
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -62,7 +65,10 @@ export default function WaitRoomPage() {
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
             Players ({playersForWaitList.length})
           </h2>
-          <PlayerTable players={playersForWaitList} />
+          <PlayerTable
+            players={playersForWaitList}
+            roomId={room?._id as Id<"game_rooms">}
+          />
         </div>
 
         {/* Add Player Section */}

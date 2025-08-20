@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LeaveGameModal } from "./leave-game-modal";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import type { Id } from "convex/_generated/dataModel";
 
 interface Player {
   id: string;
@@ -12,10 +15,13 @@ interface Player {
 
 interface PlayerRowProps {
   player: Player;
+  roomId: string;
 }
 
-export function PlayerRow({ player }: PlayerRowProps) {
+export function PlayerRow({ player, roomId }: PlayerRowProps) {
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+
+  const leaveGame = useMutation(api.rooms.removePlayerFromRoom);
 
   const handleLeaveGame = () => {
     setShowLeaveModal(true);
@@ -25,6 +31,10 @@ export function PlayerRow({ player }: PlayerRowProps) {
     console.log(`Player ${player.name} leaving game`);
     setShowLeaveModal(false);
     // Here you would add the actual leave game logic
+    leaveGame({
+      playerId: player.id as Id<"players">,
+      roomId: roomId as Id<"game_rooms">,
+    });
   };
 
   return (
