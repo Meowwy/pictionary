@@ -29,8 +29,9 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
   const [playerName, setPlayerName] = useState("");
   const [password, setPassword] = useState("");
   const [usePassword, setUsePassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     /*
@@ -41,17 +42,22 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
     const password = formData.get("password") as string;*/
 
     // because I keep the content of the form in the React state, I can just pass the variables
-    void createRoom({
+    const result = await createRoom({
       name: roomName,
       password: usePassword ? password : undefined,
       player: playerName,
       deviceId: getDeviceId(),
     });
-    navigate("/waitRoom", { state: { roomName } });
-    onClose();
-    setRoomName(""); // reseting the form, because we use react state to get the values
-    setPlayerName("");
-    setPassword("");
+
+    if (result === "room already exists") {
+      setError("Room with this name already exists. Choose different name.");
+    } else {
+      navigate("/waitRoom", { state: { roomName } });
+      onClose();
+      setRoomName(""); // reseting the form, because we use react state to get the values
+      setPlayerName("");
+      setPassword("");
+    }
   };
 
   const handleClose = () => {
@@ -140,6 +146,7 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
             </Button>
           </div>
         </form>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
       </DialogContent>
     </Dialog>
   );

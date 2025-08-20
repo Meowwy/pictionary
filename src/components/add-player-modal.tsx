@@ -29,22 +29,30 @@ export function AddPlayerModal({
   roomId,
 }: AddPlayerModalProps) {
   const [playerName, setPlayerName] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const addPlayer = useMutation(api.rooms.joinRoom);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Adding local player:", playerName);
     if (!roomId) return;
 
-    void addPlayer({
+    const result = await addPlayer({
       nickname: playerName,
       password: true,
       deviceId: getDeviceId(),
       roomId: roomId as Id<"game_rooms">,
     });
-    setPlayerName("");
-    onClose();
+
+    if (result === "player already exists") {
+      setError(
+        "Player with this name already is in the room. Choose different name."
+      );
+    } else {
+      setPlayerName("");
+      onClose();
+    }
   };
 
   return (
@@ -90,6 +98,7 @@ export function AddPlayerModal({
             </Button>
           </div>
         </form>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
       </DialogContent>
     </Dialog>
   );

@@ -48,6 +48,10 @@ export function JoinRoomModal({ isOpen, onClose, room }: JoinRoomModalProps) {
       if (result === "Incorrect password") {
         setError("Incorrect password");
         console.log("Incorrect password - error set");
+      } else if (result === "player already exists") {
+        setError(
+          "Player with this name already is in the room. Choose different name."
+        );
       } else {
         setPlayerName("");
         setPassword("");

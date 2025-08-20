@@ -16,6 +16,13 @@ export const createRoom = mutation({
         deviceId: v.string(),
     },
     handler: async (ctx, args) => {
+        const existingRoom = await ctx.db
+        .query("game_rooms")
+        .filter((q) => q.eq(q.field("name"), args.name)).first();
+        if (existingRoom) {
+            return "room already exists";
+        }
+
         const roomId = await ctx.db.insert("game_rooms", {
             name: args.name,
             password: args.password,
@@ -78,8 +85,21 @@ export const getPlayers = query({
     },
     handler: async (ctx, args) => {
       const room = await ctx.db.get(args.roomId);
+      const existingPlayer = await ctx.db
+        .query("players")
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("room_id"), args.roomId),
+            q.eq(q.field("nickname"), args.nickname)
+            )
+        )
+        .first();
+      
       if (!room) {
         throw new Error("Room not found");
+      }
+      else if(existingPlayer){
+        return "player already exists";
       }
       else if ((room.password && room.password !== args.password) || args.password === false) {
         return "Incorrect password";

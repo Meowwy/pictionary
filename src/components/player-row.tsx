@@ -1,37 +1,39 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { LeaveGameModal } from "./leave-game-modal"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { LeaveGameModal } from "./leave-game-modal";
 
 interface Player {
-  id: string
-  name: string
-  isLocal: boolean
+  id: string;
+  name: string;
+  isLocal: boolean;
 }
 
 interface PlayerRowProps {
-  player: Player
+  player: Player;
 }
 
 export function PlayerRow({ player }: PlayerRowProps) {
-  const [showLeaveModal, setShowLeaveModal] = useState(false)
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
 
   const handleLeaveGame = () => {
-    setShowLeaveModal(true)
-  }
+    setShowLeaveModal(true);
+  };
 
   const handleConfirmLeave = () => {
-    console.log(`Player ${player.name} leaving game`)
-    setShowLeaveModal(false)
+    console.log(`Player ${player.name} leaving game`);
+    setShowLeaveModal(false);
     // Here you would add the actual leave game logic
-  }
+  };
 
   return (
     <>
       <div
         className={`flex items-center justify-between p-4 ${
-          player.isLocal ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500" : "bg-white dark:bg-gray-800"
+          player.isLocal
+            ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500"
+            : "bg-white dark:bg-gray-800"
         }`}
       >
         <div className="flex-1">
@@ -43,7 +45,11 @@ export function PlayerRow({ player }: PlayerRowProps) {
             }`}
           >
             {player.name}
-            {player.isLocal && <span className="ml-2 text-sm font-normal text-blue-600 dark:text-blue-300">(You)</span>}
+            {player.isLocal && (
+              <span className="ml-2 text-sm font-normal text-blue-600 dark:text-blue-300">
+                (on this device)
+              </span>
+            )}
           </p>
         </div>
 
@@ -66,5 +72,5 @@ export function PlayerRow({ player }: PlayerRowProps) {
         playerName={player.name}
       />
     </>
-  )
+  );
 }
