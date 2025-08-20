@@ -70,7 +70,7 @@ export function PlayerRow({ player, roomId }: PlayerRowProps) {
             size="sm"
             className="ml-4 bg-red-600 hover:bg-red-700 text-white font-semibold"
           >
-            Leave Game
+            Remove from the room
           </Button>
         )}
       </div>

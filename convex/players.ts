@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server"
+import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
 
 export interface Player {
@@ -26,5 +26,18 @@ export const addNewPlayer = mutation({
             admin: args.admin,
             deviceId: args.deviceId,
         });
+},
+});
+
+export const getlocalPlayer = query({
+    args: {
+        deviceId: v.string(),
+        roomId: v.id("game_rooms"),
+    },
+    handler: async (ctx, args) => {
+        return ctx.db.query("players")
+        .filter((q) => q.eq(q.field("deviceId"), args.deviceId))
+        .filter((q) => q.eq(q.field("room_id"), args.roomId))
+        .first();
 },
 });

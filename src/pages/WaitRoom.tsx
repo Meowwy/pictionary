@@ -44,6 +44,17 @@ export default function WaitRoomPage() {
     });
   }
 
+  const localPlayer: Player | undefined = players.find(
+    (player) => player.deviceId === getDeviceId()
+  );
+
+  const canStartGame = players.length >= 2;
+
+  const handleStartGame = () => {
+    console.log("Starting game...");
+    // Game start logic will go here
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-6 max-w-2xl">
@@ -90,6 +101,25 @@ export default function WaitRoomPage() {
             </Button>
           </div>
         </div>
+
+        {/* Start Game Button */}
+        {localPlayer?.admin && (
+          <div className="mt-8">
+            <button
+              onClick={handleStartGame}
+              disabled={!canStartGame}
+              className={`w-full py-6 px-6 rounded-lg text-lg font-bold transition-all duration-200 ${
+                canStartGame
+                  ? "bg-orange-500 hover:bg-orange-600 text-white shadow-lg hover:shadow-xl"
+                  : "bg-white border-2 border-orange-500 text-orange-500 cursor-not-allowed"
+              }`}
+            >
+              {canStartGame
+                ? "When ready, press to start the game!"
+                : "Waiting for at least one other player to join"}
+            </button>
+          </div>
+        )}
 
         {/* Add Player Modal */}
         <AddPlayerModal
