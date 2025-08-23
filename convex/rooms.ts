@@ -14,6 +14,7 @@ export const createRoom = mutation({
         password: v.optional(v.string()),
         player: v.string(),
         deviceId: v.string(),
+        gameMode: v.string(),
     },
     handler: async (ctx, args) => {
         const existingRoom = await ctx.db
@@ -26,6 +27,7 @@ export const createRoom = mutation({
         const roomId = await ctx.db.insert("game_rooms", {
             name: args.name,
             password: args.password,
+            gameMode: args.gameMode,
         });
 
         // Also create the first player for the room

@@ -15,6 +15,14 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getDeviceId } from "@/utils/simpleUtils";
 import { useNavigate } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Pencil, Brain, Hand } from "lucide-react";
 
 interface CreateRoomModalProps {
   isOpen: boolean;
@@ -30,6 +38,7 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
   const [password, setPassword] = useState("");
   const [usePassword, setUsePassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [gameMode, setGameMode] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,6 +56,7 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
       password: usePassword ? password : undefined,
       player: playerName,
       deviceId: getDeviceId(),
+      gameMode: gameMode,
     });
 
     if (result === "room already exists") {
@@ -104,6 +114,35 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="game-mode">Game Mode</Label>
+            <Select value={gameMode} onValueChange={setGameMode} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select game mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="drawing">
+                  <div className="flex items-center gap-2">
+                    <Pencil className="h-4 w-4" />
+                    <span>Drawing</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="describing">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-4 w-4" />
+                    <span>Describing</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="pantomime">
+                  <div className="flex items-center gap-2">
+                    <Hand className="h-4 w-4" />
+                    <span>Pantomime</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="flex items-center space-x-2">
             <Checkbox
               id="use-password"
@@ -140,7 +179,7 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
             <Button
               type="submit"
               className="flex-1"
-              disabled={!roomName.trim() || !playerName.trim()}
+              disabled={!roomName.trim() || !playerName.trim() || !gameMode}
             >
               Create Room
             </Button>

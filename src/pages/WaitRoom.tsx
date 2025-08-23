@@ -10,6 +10,7 @@ import { api } from "../../convex/_generated/api";
 import { getDeviceId } from "@/utils/simpleUtils";
 import type { Player } from "convex/players";
 import type { Id } from "convex/_generated/dataModel";
+import { Pencil, MessageSquare, Hand } from "lucide-react";
 
 export default function WaitRoomPage() {
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
@@ -55,18 +56,39 @@ export default function WaitRoomPage() {
     // Game start logic will go here
   };
 
+  const renderGameIcon = () => {
+    switch (room?.gameMode) {
+      case "drawing":
+        return <Pencil className="w-8 h-8 md:w-10 md:h-10" />;
+      case "describing":
+        return <MessageSquare className="w-8 h-8 md:w-10 md:h-10" />;
+      case "pantomime":
+        return <Hand className="w-8 h-8 md:w-10 md:h-10" />;
+      default:
+        return <Pencil className="w-8 h-8 md:w-10 md:h-10" />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-3">
-            Waiting Room
-          </h1>
+          <div className="flex items-center justify-center gap-4 mb-3">
+            <div className="text-gray-800 dark:text-white">
+              {renderGameIcon()}
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">
+              {room?.name}
+            </h1>
+            <div className="text-gray-800 dark:text-white">
+              {renderGameIcon()}
+            </div>
+          </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Welcome to "Fun Drawing Room"! We're waiting for more players to
-              join. Get ready to draw and guess some amazing pictures!
+              We're waiting for everybody to join. Administrator then can start
+              the game!
             </p>
           </div>
         </div>

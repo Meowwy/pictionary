@@ -6,6 +6,7 @@ export default defineSchema({
     game_rooms: defineTable({
         name: v.string(),
         password: v.optional(v.string()),
+        gameMode: v.string(),
     }),
 
     players: defineTable({
@@ -15,5 +16,5 @@ export default defineSchema({
         score: v.optional(v.number()),
         deviceId: v.string(),
     
-    })
+    }),
 });
