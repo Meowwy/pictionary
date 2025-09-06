@@ -7,6 +7,7 @@ export default defineSchema({
         name: v.string(),
         password: v.optional(v.string()),
         gameMode: v.string(),
+        state: v.string(),
     }),
 
     players: defineTable({
@@ -17,4 +18,8 @@ export default defineSchema({
         deviceId: v.string(),
     
     }),
-});
+
+    game: defineTable({
+        room_id: v.id("game_rooms"),
+    }),
+})

@@ -4,28 +4,43 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlayerTable } from "@/components/player-table";
 import { AddPlayerModal } from "@/components/add-player-modal";
-import { useLocation } from "react-router-dom";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getDeviceId } from "@/utils/simpleUtils";
 import type { Player } from "convex/players";
 import type { Id } from "convex/_generated/dataModel";
 import { Pencil, MessageSquare, Hand } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function WaitRoomPage() {
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
-  const location = useLocation();
+  const [isLocalPlayer, setisLocalPlayer] = useState(true);
+  const navigate = useNavigate();
+  // grab parameters from URL
+  const { roomId: roomIdString } = useParams<{ roomId: string }>();
+  // change the type to Convex id, since it is stored as plaintext in the database
+  const roomId = roomIdString ? (roomIdString as Id<"game_rooms">) : undefined;
 
-  const roomName = location.state?.roomName;
+  const room = useQuery(api.rooms.getRoomForId, roomId ? { roomId } : "skip");
+  /*   const roomName = location.state?.roomName;
   const room =
-    useQuery(api.rooms.getRoomByRoomName, { roomName: roomName }) ?? null;
-  const playersData =
+    useQuery(api.rooms.getRoomByRoomName, { roomName: roomName }) ?? null; */
+  /*const playersData =
     useQuery(
       api.rooms.getPlayersInRoom,
       room
         ? { roomId: room._id as Id<"game_rooms"> }
         : { roomId: "" as Id<"game_rooms"> }
+    ) ?? [];*/
+  const playersData =
+    useQuery(
+      api.rooms.getPlayersInRoom,
+      room ? { roomId: room._id as Id<"game_rooms"> } : "skip"
     ) ?? [];
+
+  if (!room || !playersData) return <p>Loading...</p>;
 
   type PlayersForWaitList = {
     id: string;
@@ -48,6 +63,21 @@ export default function WaitRoomPage() {
   const localPlayer: Player | undefined = players.find(
     (player) => player.deviceId === getDeviceId()
   );
+
+  // kick player out if they don't belong to the room
+  // doesn't work
+  /*
+  useEffect(() => {
+    if (playersData && playersData.length > 0 && !localPlayer) {
+      setisLocalPlayer(false);
+    }
+  }, [playersData, localPlayer]);
+
+  useEffect(() => {
+    if (!isLocalPlayer) {
+      navigate("/", { replace: true });
+    }
+  }, [isLocalPlayer, navigate]);*/
 
   const canStartGame = players.length >= 2;
 

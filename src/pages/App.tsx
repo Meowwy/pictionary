@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CreateRoomModal } from "@/components/create-room-modal";
 import { JoinRoomModal } from "@/components/join-room-modal";
@@ -8,6 +8,8 @@ import { RoomCard } from "@/components/room-card";
 import { Users } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { getDeviceId } from "@/utils/simpleUtils";
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -15,6 +17,18 @@ export default function App() {
   const [selectedRoom, setSelectedRoom] = useState<
     (typeof roomsForCard)[0] | null
   >(null);
+  const navigate = useNavigate();
+
+  // check if the device already is in a room
+  let localPlayer =
+    useQuery(api.players.getlocalPlayerForRouting, {
+      deviceId: getDeviceId(),
+    }) ?? null;
+  useEffect(() => {
+    if (localPlayer) {
+      navigate(`/waitRoom/${localPlayer.room_id}`);
+    }
+  }, [localPlayer, navigate]);
 
   // get created rooms
   let rooms = useQuery(api.rooms.getRooms) ?? [];

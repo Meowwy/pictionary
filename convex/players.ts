@@ -41,3 +41,14 @@ export const getlocalPlayer = query({
         .first();
 },
 });
+
+export const getlocalPlayerForRouting = query({
+    args: {
+        deviceId: v.string(),
+    },
+    handler: async (ctx, args) => {
+        return ctx.db.query("players")
+        .filter((q) => q.eq(q.field("deviceId"), args.deviceId))
+        .first();
+},
+});

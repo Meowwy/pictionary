@@ -57,12 +57,13 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
       player: playerName,
       deviceId: getDeviceId(),
       gameMode: gameMode,
+      state: "waiting",
     });
 
     if (result === "room already exists") {
       setError("Room with this name already exists. Choose different name.");
     } else {
-      navigate("/waitRoom", { state: { roomName } });
+      navigate(`/waitRoom/${result}`);
       onClose();
       setRoomName(""); // reseting the form, because we use react state to get the values
       setPlayerName("");

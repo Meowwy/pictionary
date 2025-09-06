@@ -30,7 +30,6 @@ export function PlayerRow({ player, roomId }: PlayerRowProps) {
   const handleConfirmLeave = () => {
     console.log(`Player ${player.name} leaving game`);
     setShowLeaveModal(false);
-    // Here you would add the actual leave game logic
     leaveGame({
       playerId: player.id as Id<"players">,
       roomId: roomId as Id<"game_rooms">,

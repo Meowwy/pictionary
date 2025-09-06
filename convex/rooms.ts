@@ -15,6 +15,7 @@ export const createRoom = mutation({
         player: v.string(),
         deviceId: v.string(),
         gameMode: v.string(),
+        state: v.string()
     },
     handler: async (ctx, args) => {
         const existingRoom = await ctx.db
@@ -28,6 +29,7 @@ export const createRoom = mutation({
             name: args.name,
             password: args.password,
             gameMode: args.gameMode,
+            state: args.state,
         });
 
         // Also create the first player for the room
@@ -148,3 +150,13 @@ export const removePlayerFromRoom = mutation({
   },
 });
 
+export const getRoomForId = query({
+    args: {
+        roomId: v.id("game_rooms"),
+    },
+    handler: async (ctx, args) => {
+        return ctx.db.query("game_rooms")
+        .filter((q) => q.eq(q.field("_id"), args.roomId))
+        .first();
+},
+});
