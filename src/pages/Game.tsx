@@ -4,38 +4,67 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Crown } from "lucide-react";
 import { LeaveGameModal } from "@/components/leave-game-modal";
-
-// Mock data for game state
-const currentDrawer = "Paul";
-const drawingCategory = "an animal";
-
-const mockPlayers = [
-  {
-    id: "1",
-    name: "Alice Johnson",
-    score: 85,
-    isLocal: true,
-    hasBestScore: false,
-  },
-  { id: "2", name: "Paul", score: 92, isLocal: false, hasBestScore: true },
-  {
-    id: "3",
-    name: "Charlie Brown",
-    score: 78,
-    isLocal: true,
-    hasBestScore: false,
-  },
-  {
-    id: "4",
-    name: "Diana Prince",
-    score: 81,
-    isLocal: false,
-    hasBestScore: false,
-  },
-];
+import { useParams } from "react-router-dom";
+import type { Id } from "convex/_generated/dataModel";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import type { Player } from "convex/players";
+import { getDeviceId } from "@/utils/simpleUtils";
 
 export default function GamePage() {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+
+  // grab parameters from URL
+  const { gameId: gameIdString } = useParams<{ gameId: string }>();
+  // change the type to Convex id, since it is stored as plaintext in the database
+  const gameId = gameIdString ? (gameIdString as Id<"game">) : undefined;
+
+  //const room = useQuery(api.rooms.getRoomForId, roomId ? { roomId } : "skip");
+  const game = useQuery(api.game.getGame, gameId ? { gameId } : "skip");
+
+  const playersData =
+    useQuery(
+      api.rooms.getPlayersInRoom,
+      game?.room_id ? { roomId: game.room_id as Id<"game_rooms"> } : "skip"
+    ) ?? [];
+
+  if (!game || !playersData) return <p>Loading...</p>;
+
+  type PlayersForList = {
+    id: string;
+    name: string;
+    score: number;
+    isLocal: boolean;
+    hasBestScore: boolean;
+  };
+
+  let players: Player[] = playersData as Player[];
+  let playersForWaitList: PlayersForList[] = [];
+  if (players.length > 0) {
+    playersForWaitList = players.map((player) => {
+      return {
+        id: player._id,
+        name: player.nickname,
+        score: player.score,
+        isLocal: player.deviceId === getDeviceId(),
+        hasBestScore: false,
+      };
+    });
+
+    // find best score
+    const bestScore = Math.max(...playersForWaitList.map((p) => p.score));
+
+    playersForWaitList = playersForWaitList.map((p) => ({
+      ...p,
+      hasBestScore: p.score === bestScore,
+    }));
+  }
+
+  const drawingPlayer = players.find((p) => p._id === game?.currentlyDrawing);
+  const currentDrawer = drawingPlayer?.nickname ?? "";
+  const drawingCategory = game?.currentCategory
+    ? `is drawing ${game.currentCategory}`
+    : "is about to pick a category";
 
   const handleLeaveGame = () => {
     console.log("Leaving game...");
@@ -55,16 +84,14 @@ export default function GamePage() {
               </h2>
               <div className="flex-1 h-px bg-white"></div>
             </div>
-            <p className="text-white text-lg md:text-xl">
-              is drawing {drawingCategory}
-            </p>
+            <p className="text-white text-lg md:text-xl">{drawingCategory}</p>
           </div>
         </div>
 
         {/* Players Scoreboard */}
         <div className="mb-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-            {mockPlayers.map((player, index) => (
+            {playersForWaitList.map((player, index) => (
               <div
                 key={player.id}
                 className="flex items-center p-4 border-b border-black/20 dark:border-white/20 last:border-b-0"

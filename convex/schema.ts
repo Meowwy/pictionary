@@ -16,10 +16,27 @@ export default defineSchema({
         admin: v.boolean(),
         score: v.optional(v.number()),
         deviceId: v.string(),
-    
+        order: v.optional(v.number()),
     }),
 
     game: defineTable({
         room_id: v.id("game_rooms"),
+        currentlyDrawing: v.id("players"),
+        currentRound: v.number(),
+        currentCategory: v.optional(v.string()),
+        guessingPrompts: v.optional(v.array(
+            v.object(
+                {
+                    prompt: v.string(),
+                    category: v.string(),
+                    used: v.boolean(),
+                }
+            )
+        )),
+    }),
+
+    guessingPrompts: defineTable({
+        room_id: v.id("game"),
+
     }),
 })

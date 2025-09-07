@@ -18,12 +18,22 @@ export default function WaitRoomPage() {
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
   const [isLocalPlayer, setisLocalPlayer] = useState(true);
   const navigate = useNavigate();
+  const startGame = useMutation(api.game.startGame);
+
   // grab parameters from URL
   const { roomId: roomIdString } = useParams<{ roomId: string }>();
   // change the type to Convex id, since it is stored as plaintext in the database
   const roomId = roomIdString ? (roomIdString as Id<"game_rooms">) : undefined;
 
   const room = useQuery(api.rooms.getRoomForId, roomId ? { roomId } : "skip");
+  const game = useQuery(
+    api.game.getGameByRoomId,
+    room
+      ? {
+          roomId: room._id as Id<"game_rooms">,
+        }
+      : "skip"
+  );
   /*   const roomName = location.state?.roomName;
   const room =
     useQuery(api.rooms.getRoomByRoomName, { roomName: roomName }) ?? null; */
@@ -81,10 +91,19 @@ export default function WaitRoomPage() {
 
   const canStartGame = players.length >= 2;
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     console.log("Starting game...");
-    // Game start logic will go here
+    const gameId = await startGame({
+      roomId: room?._id as Id<"game_rooms">,
+    });
+    navigate(`/game/${gameId}`);
   };
+  /*
+  useEffect(() => {
+    if (game) {
+      navigate(`/game/${game._id}`);
+    }
+  }, [game]);*/
 
   const renderGameIcon = () => {
     switch (room?.gameMode) {
