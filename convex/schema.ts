@@ -36,7 +36,11 @@ export default defineSchema({
     }),
 
     guessingPrompts: defineTable({
-        room_id: v.id("game"),
+  game_id: v.id("game"),
+  theme: v.string(),
+  prompt: v.string(),
+  used: v.boolean(),
+  type: v.string(),
+}),
 
-    }),
 })
