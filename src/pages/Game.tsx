@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Crown } from "lucide-react";
 import { LeaveGameModal } from "@/components/leave-game-modal";
@@ -10,10 +10,11 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Player } from "convex/players";
 import { getDeviceId } from "@/utils/simpleUtils";
+import { useNavigate } from "react-router-dom";
 
 export default function GamePage() {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
-
+  const navigate = useNavigate();
   // grab parameters from URL
   const { gameId: gameIdString } = useParams<{ gameId: string }>();
   // change the type to Convex id, since it is stored as plaintext in the database
@@ -65,6 +66,16 @@ export default function GamePage() {
   const drawingCategory = game?.currentCategory
     ? `is drawing ${game.currentCategory}`
     : "is about to pick a category";
+
+  const localPlayer: Player | undefined = players.find(
+    (player) => player.deviceId === getDeviceId()
+  );
+
+  useEffect(() => {
+    if (drawingPlayer?._id === localPlayer?._id) {
+      navigate(`/promptSelect/${gameId}`);
+    }
+  }, [drawingPlayer, localPlayer, navigate, gameId]);
 
   const handleLeaveGame = () => {
     console.log("Leaving game...");

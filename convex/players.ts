@@ -10,6 +10,12 @@ export interface Player {
     deviceId: string;
 }
 
+export interface PlayerForSelection {
+    _id: string;
+    nickname: string;
+    order: number;
+    isLocal: boolean;
+}
 
 
 export const addNewPlayer = mutation({
@@ -50,5 +56,20 @@ export const getlocalPlayerForRouting = query({
         return ctx.db.query("players")
         .filter((q) => q.eq(q.field("deviceId"), args.deviceId))
         .first();
+},
+});
+
+export const getDrawingPlayer = query({
+    args: {
+        gameId: v.id("game"),
+    },
+    handler: async (ctx, args) => { 
+        const game = await ctx.db.get(args.gameId);
+        if (!game) throw new Error("Game not found");
+
+        const player = await ctx.db.get(game.currentlyDrawing);
+        if (!player) throw new Error("Player not found");
+
+        return player;
 },
 });

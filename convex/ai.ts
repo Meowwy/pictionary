@@ -189,7 +189,7 @@ for (const [theme, prompts] of Object.entries(resultObj)) {
       game_id,
       theme,
       prompt: p,
-      type: "party",
+      type: "activity",
     });
   }
 }
