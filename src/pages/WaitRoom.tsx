@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlayerTable } from "@/components/player-table";
 import { AddPlayerModal } from "@/components/add-player-modal";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getDeviceId } from "@/utils/simpleUtils";
 import type { Player } from "convex/players";
@@ -13,12 +13,22 @@ import { Pencil, MessageSquare, Hand } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  themesDrawingActivityMode,
+  themesDrawingSimpleMode,
+} from "../../convex/themes";
 
 export default function WaitRoomPage() {
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
   const [isLocalPlayer, setisLocalPlayer] = useState(true);
   const navigate = useNavigate();
   const startGame = useMutation(api.game.startGame);
+  const generateDrawingPromptsSimple = useAction(
+    api.ai.generateDrawingPrompts_simple
+  );
+  const generateDrawingPromptsActivity = useAction(
+    api.ai.generateDrawingPrompts_activity
+  );
 
   // grab parameters from URL
   const { roomId: roomIdString } = useParams<{ roomId: string }>();
@@ -96,6 +106,16 @@ export default function WaitRoomPage() {
     const gameId = await startGame({
       roomId: room?._id as Id<"game_rooms">,
     });
+    await generateDrawingPromptsSimple({
+      game_id: gameId,
+      themes: themesDrawingSimpleMode,
+    });
+    await generateDrawingPromptsActivity({
+      game_id: gameId,
+      themes: themesDrawingActivityMode,
+    });
+    console.log("Prompts generation started");
+
     navigate(`/game/${gameId}`);
   };
   /*

@@ -97,7 +97,6 @@ for (const [theme, prompts] of Object.entries(resultObj)) {
   },
 });
 
-
 export const generateDrawingPrompts_activity = action({
     args: {game_id: v.id("game"), themes: v.array(v.object({
       themeName: v.string(),

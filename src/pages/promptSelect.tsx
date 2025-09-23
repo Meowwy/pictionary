@@ -13,7 +13,11 @@ type GameState = "category" | "prompt" | "gameplay";
 
 export default function PromptSelectPage() {
   const [gameState, setGameState] = useState<GameState>("category");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  //const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<{
+    typeOfPrompt: string;
+    theme: string;
+  } | null>(null);
   const [selectedPrompt, setSelectedPrompt] = useState<string>("");
   const [selectedPlayer, setSelectedPlayer] = useState<string>("");
   const [isPromptVisible, setIsPromptVisible] = useState(false);
@@ -39,12 +43,18 @@ export default function PromptSelectPage() {
     gameId ? { gameId } : "skip"
   ) ?? {
     Simple: ["Loading"],
-    Activities: ["Loading"],
+    Activity: ["Loading"],
   };
 
   const prompts = useQuery(
-    api.game.getDrawingPromptsSimple,
-    gameId && selectedCategory ? { gameId, selectedCategory } : "skip"
+    api.game.getDrawingPrompts,
+    gameId && selectedCategory && selectedCategory.typeOfPrompt === "Simple"
+      ? {
+          gameId,
+          selectedType: selectedCategory.typeOfPrompt,
+          selectedCategory: selectedCategory.theme,
+        }
+      : "skip"
   );
 
   useEffect(() => {
@@ -54,7 +64,7 @@ export default function PromptSelectPage() {
     }
   }, [prompts]);
 
-  const promptsToDisplay = prompts?.map((p) => p.prompt) ?? ["Loading"];
+  let promptsToDisplay: string[] = prompts?.map((p) => p.prompt) ?? ["Loading"];
 
   const playersData =
     useQuery(
@@ -79,8 +89,11 @@ export default function PromptSelectPage() {
   if (!drawingPlayer) return <p>Loading...</p>;
   if (!drawingPlayer.order) return <p>Loading...</p>;
 
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
+  const handleCategorySelect = (categoryType: string, category: string) => {
+    setSelectedCategory({
+      typeOfPrompt: categoryType,
+      theme: category,
+    });
   };
 
   const handlePromptSelect = (prompt: string) => {
@@ -152,9 +165,9 @@ export default function PromptSelectPage() {
             {items.map((item) => (
               <button
                 key={item}
-                onClick={() => handleCategorySelect(item)}
+                onClick={() => handleCategorySelect(categoryType, item)}
                 className={`p-4 rounded-lg text-white font-semibold text-lg transition-all duration-200 ${
-                  selectedCategory === item
+                  selectedCategory?.theme === item
                     ? "bg-orange-600 shadow-lg scale-105"
                     : "bg-orange-500 hover:bg-orange-600 shadow-md"
                 }`}

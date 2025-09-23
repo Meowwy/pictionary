@@ -29,8 +29,6 @@ export default function GamePage() {
       game?.room_id ? { roomId: game.room_id as Id<"game_rooms"> } : "skip"
     ) ?? [];
 
-  if (!game || !playersData) return <p>Loading...</p>;
-
   type PlayersForList = {
     id: string;
     name: string;
@@ -72,10 +70,12 @@ export default function GamePage() {
   );
 
   useEffect(() => {
-    if (drawingPlayer?._id === localPlayer?._id) {
+    if (drawingPlayer?._id && drawingPlayer._id === localPlayer?._id) {
       navigate(`/promptSelect/${gameId}`);
     }
   }, [drawingPlayer, localPlayer, navigate, gameId]);
+
+  if (!game || !playersData) return <p>Loading...</p>;
 
   const handleLeaveGame = () => {
     console.log("Leaving game...");

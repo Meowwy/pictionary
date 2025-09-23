@@ -65,9 +65,10 @@ export const getGame = query({
 },
 });
 
-export const getDrawingPromptsSimple = query({
+export const getDrawingPrompts = query({
   args: {
     gameId: v.id("game"),
+    selectedType: v.string(),
     selectedCategory: v.string(),
   },
   handler: async (ctx, args) => {
@@ -75,23 +76,7 @@ export const getDrawingPromptsSimple = query({
       .query("guessingPrompts")
       .filter((q) => q.eq(q.field("game_id"), args.gameId))
       .filter((q) => q.eq(q.field("theme"), args.selectedCategory))
-      .filter((q) => q.eq(q.field("type"), "simple"))
-      .filter((q) => q.eq(q.field("used"), false))
-      .take(2);
-  },
-});
-
-export const getDrawingPromptsActivity = query({
-  args: {
-    gameId: v.id("game"),
-    selectedCategory: v.string(),
-  },
-  handler: async (ctx, args) => {
-    return ctx.db
-      .query("guessingPrompts")
-      .filter((q) => q.eq(q.field("game_id"), args.gameId))
-      .filter((q) => q.eq(q.field("theme"), args.selectedCategory))
-      .filter((q) => q.eq(q.field("type"), "activity"))
+      .filter((q) => q.eq(q.field("type"), args.selectedType))
       .filter((q) => q.eq(q.field("used"), false))
       .take(2);
   },
@@ -130,14 +115,14 @@ export const getDrawingThemes = query({
     const activityThemes = [
       ...new Set(
         prompts
-          .filter((p) => p.type === "activities")
+          .filter((p) => p.type === "activity")
           .map((p) => p.theme)
       ),
     ];
 
     return {
       Simple: simpleThemes,
-      Activities: activityThemes,
+      Activity: activityThemes,
     };
   },
 });

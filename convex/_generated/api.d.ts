@@ -18,6 +18,7 @@ import type * as game from "../game.js";
 import type * as players from "../players.js";
 import type * as rooms from "../rooms.js";
 import type * as savePrompts from "../savePrompts.js";
+import type * as themes from "../themes.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   players: typeof players;
   rooms: typeof rooms;
   savePrompts: typeof savePrompts;
+  themes: typeof themes;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
