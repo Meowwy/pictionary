@@ -160,3 +160,15 @@ export const getRoomForId = query({
         .first();
 },
 });
+
+export const getGameByRoomId = query({
+  args: {
+    roomId: v.id("game_rooms"),
+  },
+  handler: async (ctx, args) => {
+    return ctx.db
+      .query("game")
+      .filter((q) => q.eq(q.field("room_id"), args.roomId))
+      .first();
+  },
+});

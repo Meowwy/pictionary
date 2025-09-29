@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlayerTable } from "@/components/player-table";
 import { AddPlayerModal } from "@/components/add-player-modal";
@@ -84,6 +84,11 @@ export default function WaitRoomPage() {
     (player) => player.deviceId === getDeviceId()
   );
 
+  useEffect(() => {
+    if (game) {
+      navigate(`/game/${game._id}`);
+    }
+  }, [game]);
   // kick player out if they don't belong to the room
   // doesn't work
   /*

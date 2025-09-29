@@ -156,18 +156,19 @@ export default function PromptSelectPage() {
         Select Category
       </h1>
 
-      {Object.entries(categories).map(([categoryType, items]) => (
-        <div key={categoryType} className="space-y-4">
+      {Object.entries(categories).map(([categoryType, items], index) => (
+        <div key={index} className="space-y-4">
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">
             {categoryType}
           </h2>
           <div className="grid grid-cols-2 gap-3">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <button
-                key={item}
+                key={index}
                 onClick={() => handleCategorySelect(categoryType, item)}
                 className={`p-4 rounded-lg text-white font-semibold text-lg transition-all duration-200 ${
-                  selectedCategory?.theme === item
+                  selectedCategory?.theme === item &&
+                  selectedCategory?.typeOfPrompt === categoryType
                     ? "bg-orange-600 shadow-lg scale-105"
                     : "bg-orange-500 hover:bg-orange-600 shadow-md"
                 }`}
@@ -179,16 +180,14 @@ export default function PromptSelectPage() {
         </div>
       ))}
 
-      {selectedCategory && (
-        <div className="fixed bottom-6 right-6">
-          <Button
-            onClick={handleContinue}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg font-semibold"
-          >
-            Continue
-          </Button>
-        </div>
-      )}
+      <div className="">
+        <Button
+          onClick={handleContinue}
+          className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg font-semibold"
+        >
+          Continue
+        </Button>
+      </div>
     </div>
   );
 
