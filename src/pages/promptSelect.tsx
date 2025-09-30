@@ -21,6 +21,10 @@ export default function PromptSelectPage() {
   const [selectedPrompt, setSelectedPrompt] = useState<string>("");
   const [selectedPlayer, setSelectedPlayer] = useState<string>("");
   const [isPromptVisible, setIsPromptVisible] = useState(false);
+  const [promptsToDisplay, setPromptsToDisplay] = useState<string[]>([
+    "Loading",
+  ]);
+  const [promptsFetched, setPromptsFetched] = useState(false);
 
   const markPromptsUsed = useMutation(api.game.markPromptsUsed);
   const increasePlayerScore = useMutation(api.game.increasePlayerScore);
@@ -42,13 +46,13 @@ export default function PromptSelectPage() {
     api.game.getDrawingThemes,
     gameId ? { gameId } : "skip"
   ) ?? {
-    Simple: ["Loading"],
-    Activity: ["Loading"],
+    simple: ["Loading"],
+    activity: ["Loading"],
   };
 
   const prompts = useQuery(
     api.game.getDrawingPrompts,
-    gameId && selectedCategory && selectedCategory.typeOfPrompt === "Simple"
+    !promptsFetched && gameId && selectedCategory
       ? {
           gameId,
           selectedType: selectedCategory.typeOfPrompt,
@@ -58,13 +62,14 @@ export default function PromptSelectPage() {
   );
 
   useEffect(() => {
-    if (prompts && prompts.length > 0) {
+    if (prompts && prompts.length > 0 && !promptsFetched) {
       const ids = prompts.map((p) => p._id);
       markPromptsUsed({ promptIds: ids });
+      setPromptsToDisplay(prompts.map((p) => p.prompt));
+      setPromptsFetched(true);
     }
+    console.log("Prompts query result:", prompts);
   }, [prompts]);
-
-  let promptsToDisplay: string[] = prompts?.map((p) => p.prompt) ?? ["Loading"];
 
   const playersData =
     useQuery(

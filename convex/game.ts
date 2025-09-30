@@ -1,5 +1,7 @@
-import { mutation, query } from "./_generated/server"
+import { mutation, query, action } from "./_generated/server"
 import { v } from "convex/values"
+import { QueryBuilder } from "convex/server";
+import { Doc } from "./_generated/dataModel";
 
 export const startGame = mutation({
     args: {
@@ -121,8 +123,8 @@ export const getDrawingThemes = query({
     ];
 
     return {
-      Simple: simpleThemes,
-      Activity: activityThemes,
+      simple: simpleThemes,
+      activity: activityThemes,
     };
   },
 });

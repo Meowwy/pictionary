@@ -1,6 +1,5 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
-import OpenAI from "openai";
 import { api } from "./_generated/api";
 
 export const generateDrawingPrompts_simple = action({

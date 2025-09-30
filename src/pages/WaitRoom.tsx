@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlayerTable } from "@/components/player-table";
 import { AddPlayerModal } from "@/components/add-player-modal";
@@ -54,6 +54,12 @@ export default function WaitRoomPage() {
         ? { roomId: room._id as Id<"game_rooms"> }
         : { roomId: "" as Id<"game_rooms"> }
     ) ?? [];*/
+  useEffect(() => {
+    if (game) {
+      navigate(`/game/${game._id}`);
+    }
+  }, [game]);
+
   const playersData =
     useQuery(
       api.rooms.getPlayersInRoom,
@@ -84,11 +90,6 @@ export default function WaitRoomPage() {
     (player) => player.deviceId === getDeviceId()
   );
 
-  useEffect(() => {
-    if (game) {
-      navigate(`/game/${game._id}`);
-    }
-  }, [game]);
   // kick player out if they don't belong to the room
   // doesn't work
   /*
