@@ -30,6 +30,8 @@ export default function WaitRoomPage() {
     api.ai.generateDrawingPrompts_activity
   );
 
+  const promptsReady = useMutation(api.game.setGameReady);
+
   // grab parameters from URL
   const { roomId: roomIdString } = useParams<{ roomId: string }>();
   // change the type to Convex id, since it is stored as plaintext in the database
@@ -112,17 +114,34 @@ export default function WaitRoomPage() {
     const gameId = await startGame({
       roomId: room?._id as Id<"game_rooms">,
     });
-    await generateDrawingPromptsSimple({
+
+    // Fire both promises immediately
+    const simplePromise = generateDrawingPromptsSimple({
       game_id: gameId,
       themes: themesDrawingSimpleMode,
     });
-    await generateDrawingPromptsActivity({
+
+    const activityPromise = generateDrawingPromptsActivity({
       game_id: gameId,
       themes: themesDrawingActivityMode,
     });
-    console.log("Prompts generation started");
 
+    // Don't block navigation
     navigate(`/game/${gameId}`);
+
+    // React only when both are done
+    Promise.all([simplePromise, activityPromise])
+      .then(async ([simpleResult, activityResult]) => {
+        if (simpleResult === "saved" && activityResult === "saved") {
+          console.log("Both prompts finished generating!");
+          await promptsReady({ roomId: roomId as Id<"game_rooms"> });
+        }
+      })
+      .catch((err) => {
+        console.error("Error while generating prompts:", err);
+      });
+
+    console.log("Prompts generation started (async)");
   };
   /*
   useEffect(() => {

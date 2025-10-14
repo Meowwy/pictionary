@@ -8,8 +8,6 @@ export const startGame = mutation({
         roomId: v.id("game_rooms"),
     },
     handler: async (ctx, args) => {
-      await ctx.db.patch(args.roomId, {state: "game"})
-
       const checkGame = await ctx.db
         .query("game")
         .filter(q => q.eq(q.field("room_id"), args.roomId))
@@ -94,6 +92,27 @@ export const markPromptsUsed = mutation({
     }
   },
 });
+
+export const setGameReady = mutation({
+  args: {
+    roomId: v.id("game_rooms"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.roomId, {state: "game"});
+  },
+});
+
+export const checkGameReady = query({
+  args: {
+    roomId: v.id("game_rooms"),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId);
+    if (!room) throw new Error("Room not found");
+    return room.state === "game";
+  },
+});
+
 
 export const getDrawingThemes = query({
   args: {

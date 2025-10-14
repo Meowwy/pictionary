@@ -25,6 +25,7 @@ export default function PromptSelectPage() {
     "Loading",
   ]);
   const [promptsFetched, setPromptsFetched] = useState(false);
+  const [isConfirmedPlayer, setIsConfirmedPlayer] = useState(false);
 
   const markPromptsUsed = useMutation(api.game.markPromptsUsed);
   const increasePlayerScore = useMutation(api.game.increasePlayerScore);
@@ -117,41 +118,43 @@ export default function PromptSelectPage() {
     setGameState("gameplay");
   };
 
-  const handleConfirmPlayer = () => {
+  const handleConfirmPlayer = async () => {
     console.log("Player confirmed:", selectedPlayer);
+    setIsConfirmedPlayer(true);
     if (!drawingPlayer) return;
     if (!drawingPlayer.order) return;
     // add points for guessed player
-    increasePlayerScore({
+    await increasePlayerScore({
       playerId: selectedPlayer as Id<"players">,
       increaseBy: 1,
     });
     // add points for drawing player
-    increasePlayerScore({
+    await increasePlayerScore({
       playerId: game.currentlyDrawing as Id<"players">,
       increaseBy: 1,
     });
     // change drawing player
-    if (drawingPlayer.order ?? 0 < maxOrder) {
+    if (drawingPlayer.order < maxOrder) {
       const nextPlayer = playersData.find(
-        (p) => p.order === (drawingPlayer?.order ?? 0) + 1 // problem here
+        (p) => p.order === (drawingPlayer?.order ?? 0) + 1
       );
       if (nextPlayer) {
-        changeDrawingPlayer({
+        await changeDrawingPlayer({
           gameId: gameId as Id<"game">,
           playerId: nextPlayer?._id,
         });
       }
-    } else if (drawingPlayer.order >= maxOrder) {
+    } else {
       const firstPlayer = playersData.find((p) => p.order === 1);
       if (firstPlayer) {
-        changeDrawingPlayer({
+        await changeDrawingPlayer({
           gameId: gameId as Id<"game">,
           playerId: firstPlayer?._id,
         });
       }
     }
     // redirect back to main game view
+    console.log("Redirected back to game view");
     navigate(`/game/${gameId}`);
   };
 
@@ -259,7 +262,7 @@ export default function PromptSelectPage() {
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-orange-500">
-            {isPromptVisible ? selectedPrompt : "★".repeat(7)}
+            {isPromptVisible ? selectedPrompt : "*".repeat(7)}
           </p>
         </div>
       </div>
@@ -295,12 +298,28 @@ export default function PromptSelectPage() {
         </div>
 
         {selectedPlayer && (
-          <Button
-            onClick={handleConfirmPlayer}
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-3 text-lg font-semibold"
-          >
-            Confirm Player
-          </Button>
+          <div className="w-full flex flex-col items-center">
+            <Button
+              onClick={handleConfirmPlayer}
+              disabled={isConfirmedPlayer}
+              className={`
+        w-full py-3 text-lg font-semibold 
+        ${
+          isConfirmedPlayer
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-green-500 hover:bg-green-600 text-white"
+        }
+      `}
+            >
+              Confirm Player
+            </Button>
+
+            {isConfirmedPlayer && (
+              <span className="mt-2 text-sm text-gray-500 animate-pulse">
+                Saving...
+              </span>
+            )}
+          </div>
         )}
       </div>
     </div>

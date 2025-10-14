@@ -23,6 +23,15 @@ export default function GamePage() {
   //const room = useQuery(api.rooms.getRoomForId, roomId ? { roomId } : "skip");
   const game = useQuery(api.game.getGame, gameId ? { gameId } : "skip");
 
+  const gameReady = useQuery(
+    api.game.checkGameReady,
+    game
+      ? {
+          roomId: game.room_id as Id<"game_rooms">,
+        }
+      : "skip"
+  );
+
   const playersData =
     useQuery(
       api.rooms.getPlayersInRoom,
@@ -70,12 +79,16 @@ export default function GamePage() {
   );
 
   useEffect(() => {
-    if (drawingPlayer?._id && drawingPlayer._id === localPlayer?._id) {
+    if (
+      drawingPlayer?._id &&
+      drawingPlayer._id === localPlayer?._id &&
+      gameReady
+    ) {
       navigate(`/promptSelect/${gameId}`);
     }
-  }, [drawingPlayer, localPlayer, navigate, gameId]);
+  }, [drawingPlayer, localPlayer, navigate, gameId, gameReady]);
 
-  if (!game || !playersData) return <p>Loading...</p>;
+  if (!game || !playersData || !gameReady) return <p>Loading...</p>;
 
   const handleLeaveGame = () => {
     console.log("Leaving game...");
