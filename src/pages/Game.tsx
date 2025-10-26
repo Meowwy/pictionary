@@ -88,7 +88,18 @@ export default function GamePage() {
     }
   }, [drawingPlayer, localPlayer, navigate, gameId, gameReady]);
 
-  if (!game || !playersData || !gameReady) return <p>Loading...</p>;
+  if (!game || !playersData || !gameReady) {
+    return (
+      <>
+        <div className="flex flex-col items-center justify-center h-screen bg-orange-500 text-white">
+          <h1 className="text-4xl font-bold animate-pulse">
+            Game is loading...
+          </h1>
+        </div>
+        <div className="mt-4 w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+      </>
+    );
+  }
 
   const handleLeaveGame = () => {
     console.log("Leaving game...");

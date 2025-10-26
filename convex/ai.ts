@@ -15,10 +15,10 @@ export const generateDrawingPrompts_simple = action({
     for (const theme of themes) {
       properties[theme] = {
         type: "array",
-        description: `10 návrhů pro kreslení pro téma "${theme}"`,
+        description: `5 návrhů pro kreslení pro téma "${theme}"`,
         items: { type: "string" },
-        minItems: 10,
-        maxItems: 10,
+        minItems: 5,
+        maxItems: 5,
       };
     }
 
@@ -79,10 +79,12 @@ if (typeof content === "string") {
 } else {
   throw new Error("Unexpected content type from OpenAI");
 }
+console.log("Response parsed simple");
 for (const [theme, prompts] of Object.entries(resultObj)) {
   if (!Array.isArray(prompts)) continue;
   for (const p of prompts) {
     if (typeof p !== "string") continue;
+    console.log("Saving" + p + " prompt in simple");
     await ctx.runMutation(api.savePrompts.savePrompts, {
       game_id,
       theme,
@@ -115,10 +117,10 @@ const properties: Record<string, any> = {};
 for (const { themeName, description } of themes) {
   properties[themeName] = {
     type: "array",
-    description: `10 návrhů pro kreslení pro téma "${themeName}". Instrukce: ${description}`,
+    description: `5 návrhů pro kreslení pro téma "${themeName}". Instrukce: ${description}`,
     items: { type: "string" },
-    minItems: 10,
-    maxItems: 10,
+    minItems: 5,
+    maxItems: 5,
   };
 }
 
@@ -179,10 +181,12 @@ if (typeof content === "string") {
 } else {
   throw new Error("Unexpected content type from OpenAI");
 }
+console.log("Response parsed activity");
 for (const [theme, prompts] of Object.entries(resultObj)) {
   if (!Array.isArray(prompts)) continue;
   for (const p of prompts) {
     if (typeof p !== "string") continue;
+    console.log("Saving" + p + " prompt in activity");
     await ctx.runMutation(api.savePrompts.savePrompts, {
       game_id,
       theme,

@@ -120,28 +120,33 @@ export default function WaitRoomPage() {
       game_id: gameId,
       themes: themesDrawingSimpleMode,
     });
+    console.log("Simple generation started!");
 
     const activityPromise = generateDrawingPromptsActivity({
       game_id: gameId,
       themes: themesDrawingActivityMode,
     });
+    console.log("Activity generation started!");
 
     // Don't block navigation
     navigate(`/game/${gameId}`);
 
-    // React only when both are done
-    Promise.all([simplePromise, activityPromise])
-      .then(async ([simpleResult, activityResult]) => {
-        if (simpleResult === "saved" && activityResult === "saved") {
-          console.log("Both prompts finished generating!");
-          await promptsReady({ roomId: roomId as Id<"game_rooms"> });
-        }
-      })
-      .catch((err) => {
-        console.error("Error while generating prompts:", err);
-      });
+    try {
+      const [simpleRes, activityRes] = await Promise.all([
+        simplePromise,
+        activityPromise,
+      ]);
 
-    console.log("Prompts generation started (async)");
+      if (simpleRes === "saved" && activityRes === "saved") {
+        console.log("Both prompts finished generating!");
+        await promptsReady({ roomId: roomId as Id<"game_rooms"> });
+        console.log("State changed in the database");
+      } else {
+        console.log("Error in prompt generation");
+      }
+    } catch (err) {
+      console.log("Error with prompt generation: " + err);
+    }
   };
   /*
   useEffect(() => {
