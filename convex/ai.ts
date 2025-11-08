@@ -183,13 +183,16 @@ if (typeof content === "string") {
 }
 console.log("Response parsed activity");
 for (const [theme, prompts] of Object.entries(resultObj)) {
+  const fixedTheme = themes.find(t => t.themeName.charAt(0) === theme.charAt(0))?.themeName ?? "noThemeFound";
+  console.log("This is activity theme " + theme);
+  console.log("Fixed theme is" + fixedTheme);
   if (!Array.isArray(prompts)) continue;
   for (const p of prompts) {
     if (typeof p !== "string") continue;
     console.log("Saving" + p + " prompt in activity");
     await ctx.runMutation(api.savePrompts.savePrompts, {
       game_id,
-      theme,
+      theme: fixedTheme,
       prompt: p,
       type: "activity",
     });
