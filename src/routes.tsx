@@ -3,6 +3,7 @@ import App from "@/pages/App";
 import WaitRoom from "@/pages/WaitRoom";
 import Game from "./pages/Game";
 import PromptSelect from "./pages/promptSelect";
+import Generator from "./pages/Generator";
 
 export default function Router() {
   return (
@@ -12,6 +13,7 @@ export default function Router() {
         <Route path="/waitRoom/:roomId" element={<WaitRoom />} />
         <Route path="/game/:gameId" element={<Game />} />
         <Route path="/promptSelect/:gameId" element={<PromptSelect />} />
+        <Route path="/generator" element={<Generator />} />
         {/* fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

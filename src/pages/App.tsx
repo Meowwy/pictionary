@@ -76,13 +76,21 @@ export default function App() {
         </div>
 
         {/* Create Room Button */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-8 gap-4">
           <Button
             onClick={() => setIsCreateModalOpen(true)}
             size="lg"
             className="px-8 py-3 text-lg font-semibold"
           >
             Create New Room
+          </Button>
+
+          <Button
+            onClick={() => navigate("/generator")}
+            size="lg"
+            className="px-8 py-3 text-lg font-semibold"
+          >
+            Open generator
           </Button>
         </div>
 
